@@ -24,7 +24,7 @@ wget -qO- {{ site.url }}/scpcom-packages.asc | sudo tee /etc/apt/keyrings/scpcom
 Next, create the source in `/etc/apt/sources.list.d/`
 
 ```
-echo "deb [arch=all signed-by=/etc/apt/keyrings/scpcom-packages.asc] {{ site.url }}/deb stable main" | sudo tee /etc/apt/sources.list.d/scpcom-packages.list >/dev/null
+echo "deb [arch=riscv64 signed-by=/etc/apt/keyrings/scpcom-packages.asc] {{ site.url }}/deb stable sg200x" | sudo tee /etc/apt/sources.list.d/scpcom-packages.list >/dev/null
 ```
 
 Then run `apt update && apt install -y` followed by the names of the packages you want to install.
