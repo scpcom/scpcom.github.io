@@ -1,0 +1,15 @@
+title: scpcom
+email: jon@sprig.gs
+description: >- 
+  This project is a script which polls the AWS Metadata Service looking for a termination warning, and triggers a response.
+baseurl: ""
+url: "https://scpcom.github.io"
+github_username: scpcom
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+exclude:
+  - tools/
+  - doc/

@@ -1,0 +1,2 @@
+Fishwaldo/sophgo-sg200x-packages
+scpcom/sophgo-sg200x-debian
