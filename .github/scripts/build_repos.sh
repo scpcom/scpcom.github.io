@@ -51,10 +51,6 @@ main() {
         wget -q "https://github.com/${repo}/releases/download/${tag}/${tar_file}"
         tar -xzf ${tar_file}
         rm -f ${tar_file}
-        for deb_file in *.deb ; do
-          new_file=$(echo ${deb_file} | sed s/'\.deb$'/''/g | cut -d _ -f 1-2)_${DEB_ARCH}.deb
-          [ $deb_file = $new_file ] || mv $deb_file $new_file
-        done
         #for deb_file in *pinmux*.deb ; do
         #  if [ -e $deb_file ]; then
         #    mkdir -p ../${DEB_SOC}
