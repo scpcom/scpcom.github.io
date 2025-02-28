@@ -51,12 +51,12 @@ main() {
         wget -q "https://github.com/${repo}/releases/download/${tag}/${tar_file}"
         tar -xzf ${tar_file}
         rm -f ${tar_file}
-        #for deb_file in *pinmux*.deb ; do
-        #  if [ -e $deb_file ]; then
-        #    mkdir -p ../${DEB_SOC}
-        #    mv $deb_file ../${DEB_SOC}/
-        #  fi
-        #done
+        for deb_file in *pinmux*.deb ; do
+          if [ -e $deb_file ]; then
+            mkdir -p ../${DEB_SOC}
+            mv $deb_file ../${DEB_SOC}/
+          fi
+        done
         popd >/dev/null
       done
     fi
