@@ -27,6 +27,12 @@ Next, create the source in `/etc/apt/sources.list.d/`
 echo "deb [arch=riscv64 signed-by=/etc/apt/keyrings/scpcom-packages.asc] {{ site.url }}/deb stable sg200x" | sudo tee /etc/apt/sources.list.d/scpcom-packages.list >/dev/null
 ```
 
+To get all packages you can add the repository matching the board-specific image:
+
+```
+echo "deb [arch=riscv64 signed-by=/etc/apt/keyrings/scpcom-packages.asc] {{ site.url }}/deb stable sg200x licheervnano-kvm" | sudo tee /etc/apt/sources.list.d/scpcom-packages.list >/dev/null
+```
+
 Then run `apt update && apt install -y` followed by the names of the packages you want to install.
 
 ### The packages you can install
@@ -35,6 +41,14 @@ Currently these are:
 
 * cvi-pinmux-cv181x
 * duo-pinmux
+
+...and board-specific packages like:
+
+* cvitek-fsbl-licheervnano
+* cvitek-middleware-licheervnano
+* cvitek-osdrv-licheervnano
+* linux-image-licheervnano-kvm
+* nanokvm-licheervnano
 
 ## How to contribute?
 
@@ -49,5 +63,5 @@ Have your own enhancements or bug fixes? Please create a
 ## Thanks
 
 The work is based on Fishwaldos Debian repositories:
-https://github.com/Fishwaldo/sophgo-sg200x-debian
-https://github.com/Fishwaldo/sophgo-sg200x-packages
+[Fishwaldo/sophgo-sg200x-debian](https://github.com/Fishwaldo/sophgo-sg200x-debian)
+[Fishwaldo/sophgo-sg200x-packages](https://github.com/Fishwaldo/sophgo-sg200x-packages)
