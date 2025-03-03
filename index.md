@@ -41,6 +41,7 @@ Currently these are:
 
 * cvi-pinmux-cv181x
 * duo-pinmux
+* firmware-vcodec-cv181x
 
 ...and board-specific packages like:
 
@@ -49,6 +50,7 @@ Currently these are:
 * cvitek-osdrv-licheervnano
 * linux-image-licheervnano-kvm
 * nanokvm-licheervnano
+* sensor-config-licheervnano
 
 ## How to contribute?
 
