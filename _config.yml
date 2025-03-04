@@ -1,7 +1,7 @@
 title: scpcom
-email: jon@sprig.gs
+email: scpcom@users.noreply.github.com
 description: >- 
-  This project is a script which polls the AWS Metadata Service looking for a termination warning, and triggers a response.
+  This project provides debian packages for sg200x based boards.
 baseurl: ""
 url: "https://scpcom.github.io"
 github_username: scpcom
