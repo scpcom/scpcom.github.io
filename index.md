@@ -64,6 +64,6 @@ Have your own enhancements or bug fixes? Please create a
 
 ## Thanks
 
-The work is based on Fishwaldos Debian repositories:
-[Fishwaldo/sophgo-sg200x-debian](https://github.com/Fishwaldo/sophgo-sg200x-debian)
+The work is based on Fishwaldos Debian repositories:  
+[Fishwaldo/sophgo-sg200x-debian](https://github.com/Fishwaldo/sophgo-sg200x-debian)  
 [Fishwaldo/sophgo-sg200x-packages](https://github.com/Fishwaldo/sophgo-sg200x-packages)
