@@ -40,15 +40,18 @@ Then run `apt update && apt install -y` followed by the names of the packages yo
 Currently these are:
 
 * cvi-pinmux-cv181x
-* duo-pinmux
 * firmware-vcodec-cv181x
 
 ...and board-specific packages like:
 
 * cvitek-fsbl-licheervnano
 * cvitek-middleware-licheervnano
-* cvitek-osdrv-licheervnano
+* cvitek-osdrv-licheervnano-kvm
+* device-key-licheervnano
+* duo-pinmux-duo256
+* gadget-nic-licheervnano
 * linux-image-licheervnano-kvm
+* load-systemko-licheervnano
 * nanokvm-licheervnano
 * sensor-config-licheervnano
 
