@@ -3,7 +3,7 @@
 # - https://earthly.dev/blog/creating-and-hosting-your-own-deb-packages-and-apt-repo/
 #
 # This file was also based on the Jekyll page builder which is a default from Github.
-name: Deploy Debian and RPM Repo plus Jekyll homepage
+name: Deploy Debian Repo plus Jekyll homepage
 
 on:
   push:
