@@ -11,6 +11,23 @@ generate_hashes() {
   done
 }
 
+latest_json() {
+  LATEST_VERSION=$2
+  LATEST_FILE=$1_$2.tar.gz
+  LATEST_SHAB64=$(sha512sum ${LATEST_FILE} | xxd -p -r | basenc --base64 --wrap=0)
+  LATEST_BYTES=$(expr $(stat -c %s ${LATEST_FILE}) + 512)
+  LATEST_SIZE=$(expr ${LATEST_BYTES} / 1024)
+
+  cat <<EOF
+{
+  "version": "${LATEST_VERSION}",
+  "name": "${LATEST_FILE}",
+  "sha512": "${LATEST_SHAB64}",
+  "size": ${LATEST_SIZE}
+}
+EOF
+}
+
 main() {
   GOT_DEB=0
   DEB_ARCH=riscv64
@@ -29,6 +46,7 @@ main() {
       tag="$(echo "$release" | jq -r '.tag_name')"
       deb_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith(".deb")) | .name')"
       deb_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-sd_debs.tar.gz")) | .name')"
+      latest_zip_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-latest.zip")) | .name')"
       echo "Parsing repo $repo at $tag"
       for deb_file in $deb_files ; do
       if [ -n "$deb_file" ]
@@ -58,6 +76,30 @@ main() {
           fi
         done
         popd >/dev/null
+      done
+      for latest_zip_file in $latest_zip_files ; do
+      if [ -n "$latest_zip_file" ]
+      then
+        GOT_ZIP=1
+        zip_sdk_ver=glibc_${DEB_ARCH}
+        echo $repo | grep -q sophgo-sg200x-debian || zip_sdk_ver=musl_${DEB_ARCH}
+        zip_component="$(echo ${latest_zip_file} | cut -d '-' -f 1)"
+        zip_compopool="_site/${zip_component}/${zip_sdk_ver}"
+        mkdir -p "$zip_compopool"
+        pushd "$zip_compopool" >/dev/null
+        echo "Getting ZIP"
+        wget -q "https://github.com/${repo}/releases/download/${tag}/${latest_zip_file}"
+        mv ${latest_zip_file} latest.zip
+        rm -f latest
+        unzip latest.zip latest/*
+        zip_version=$(cat latest/version)
+        mv latest ${zip_component}_${zip_version}
+        cp -p ${zip_component}_${zip_version}/version latest
+        tar -czf ${zip_component}_${zip_version}.tar.gz ${zip_component}_${zip_version}
+        latest_json ${zip_component} ${zip_version} > latest.json
+        rm -rf ${zip_component}_${zip_version}
+        popd >/dev/null
+      fi
       done
     fi
   done < .github/config/package_list.txt
