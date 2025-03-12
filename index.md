@@ -9,10 +9,20 @@ title: Run Debian on Sophgo cv181x/sg200x based boards
 
 You will also need to use an image matching your board, which are available from:
 
-* [scpcom/sophgo-sg200x-debian](
+* [scpcom/sophgo-sg200x-debian/releases](
 https://github.com/scpcom/sophgo-sg200x-debian/releases/latest)
 
+### About the images
+
+Details about the content and some hints howto configure itc an be found in the readme here:
+
+* [scpcom/sophgo-sg200x-debian](
+https://github.com/scpcom/sophgo-sg200x-debian)
+
 ### Add a Debian Repository
+
+This step is only required if you are using an older image or build your own.  
+If you have image version v1.5.20 or later this is already included.
 
 Download the [public key](scpcom-packages.gpg) and put it in
 `/etc/apt/keyrings/scpcom-packages.gpg`. You can achieve this with:
