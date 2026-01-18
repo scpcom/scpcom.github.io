@@ -46,7 +46,7 @@ main() {
     then
       tag="$(echo "$release" | jq -r '.tag_name')"
       deb_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith(".deb")) | .name')"
-      deb_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-sd_debs.tar.gz")) | .name')"
+      deb_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("_debs.tar.gz")) | .name')"
       latest_zip_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-latest.zip")) | .name')"
       echo "Parsing repo $repo at $tag"
       for deb_file in $deb_files ; do
