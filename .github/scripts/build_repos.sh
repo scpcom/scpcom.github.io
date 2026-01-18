@@ -34,6 +34,7 @@ main() {
   DEB_SOC=sg200x
   COMPONENTS="${DEB_SOC}"
   DEB_POOL="_site/deb/pool/${COMPONENTS:-main}"
+  DEB_DISTS_ARCHS="arm64 riscv64"
   DEB_DISTS="dists/${SUITE:-stable}"
   DEB_DISTS_COMPONENTS="${DEB_DISTS}/${COMPONENTS:-main}/binary-all"
   GPG_TTY=""
@@ -107,17 +108,19 @@ main() {
   if [ $GOT_DEB -eq 1 ]
   then
     for component in _site/deb/pool/* ; do
-    COMPONENTS="$(basename ${component})"
-    DEB_POOL="_site/deb/pool/${COMPONENTS:-main}"
-    DEB_DISTS="dists/${SUITE:-stable}"
-    DEB_DISTS_COMPONENTS="${DEB_DISTS}/${COMPONENTS:-main}/binary-${DEB_ARCH}"
-    pushd _site/deb >/dev/null
-    mkdir -p "${DEB_DISTS_COMPONENTS}"
-    echo "Scanning all downloaded DEB Packages and creating Packages file."
-    dpkg-scanpackages --arch ${DEB_ARCH} pool/${COMPONENTS:-main} > "${DEB_DISTS_COMPONENTS}/Packages"
-    gzip -9 > "${DEB_DISTS_COMPONENTS}/Packages.gz" < "${DEB_DISTS_COMPONENTS}/Packages"
-    bzip2 -9 > "${DEB_DISTS_COMPONENTS}/Packages.bz2" < "${DEB_DISTS_COMPONENTS}/Packages"
-    popd >/dev/null
+      COMPONENTS="$(basename ${component})"
+      DEB_POOL="_site/deb/pool/${COMPONENTS:-main}"
+      DEB_DISTS="dists/${SUITE:-stable}"
+      pushd _site/deb >/dev/null
+      for DEB_DISTS_ARCH in $DEB_DISTS_ARCHS ; do
+        DEB_DISTS_COMPONENTS="${DEB_DISTS}/${COMPONENTS:-main}/binary-${DEB_DISTS_ARCH}"
+        mkdir -p "${DEB_DISTS_COMPONENTS}"
+        echo "Scanning all downloaded DEB Packages and creating Packages file."
+        dpkg-scanpackages --arch ${DEB_DISTS_ARCH} pool/${COMPONENTS:-main} > "${DEB_DISTS_COMPONENTS}/Packages"
+        gzip -9 > "${DEB_DISTS_COMPONENTS}/Packages.gz" < "${DEB_DISTS_COMPONENTS}/Packages"
+        bzip2 -9 > "${DEB_DISTS_COMPONENTS}/Packages.bz2" < "${DEB_DISTS_COMPONENTS}/Packages"
+      done
+      popd >/dev/null
     done
     pushd "_site/deb/${DEB_DISTS}" >/dev/null
     rm -f *Release*
@@ -129,7 +132,7 @@ main() {
       echo "Suite: ${SUITE:-stable}"
       echo "Codename: ${SUITE:-stable}"
       echo "Version: 1.0"
-      echo "Architectures: ${DEB_ARCH}"
+      echo "Architectures: ${DEB_DISTS_ARCHS}"
       echo "Components: ${COMPONENTS:-main}"
       echo "Description: ${DESCRIPTION:-A repository for packages released by ${REPO_OWNER}}"
       echo "Date: $(date -Ru)"
