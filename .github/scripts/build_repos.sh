@@ -61,7 +61,13 @@ main() {
       fi
       done
       for tar_file in $deb_tar_files ; do
-        deb_component="$(echo ${tar_file} | cut -d '_' -f 1 | sed s/'-sd$'/''/g)"
+        if echo ${tar_file} | grep -q '-emmc_' ; then
+          sd_file="$(echo ${tar_file} | sed s/'-emmc_'/'-sd_'/g)"
+          if echo $deb_tar_files | grep -q ${sd_file} ; then
+            continue
+          fi
+        fi
+        deb_component="$(echo ${tar_file} | cut -d '_' -f 1 | sed s/'-emmc$'/''/g | sed s/'-sd$'/''/g)"
         deb_compopool="_site/deb/pool/${deb_component}"
         GOT_DEB=1
         mkdir -p "$deb_compopool"
