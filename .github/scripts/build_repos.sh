@@ -131,6 +131,9 @@ main() {
           mkdir -p "$tar_compopool"
           mv "$deb_compopool"/${tar_component}_${tar_version}.tar.gz "$tar_compopool"/
           mv "$deb_compopool"/${tar_component}_latest.json "$tar_compopool"/
+          mkdir -p "$tar_compopool"/preview
+          cp -p "$tar_compopool"/*.tar.* "$tar_compopool"/preview/
+          cp -p "$tar_compopool"/*.json "$tar_compopool"/preview/
         fi
       done
       for latest_zip_file in $latest_zip_files ; do
