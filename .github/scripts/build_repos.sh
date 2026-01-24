@@ -11,6 +11,29 @@ generate_hashes() {
   done
 }
 
+generate_json() {
+  CONTENT_VERSION=$2
+  CONTENT_FILE=$1_$2$3
+  CONTENT_SHAB64=$(sha512sum ${CONTENT_FILE} | xxd -p -r | basenc --base64 --wrap=0)
+  CONTENT_BYTES=$(stat -c %s ${CONTENT_FILE})
+  CONTENT_SIZE=${CONTENT_BYTES}
+  #CONTENT_BYTES=$(expr $(stat -c %s ${CONTENT_FILE}) + 512)
+  #CONTENT_SIZE=$(expr ${CONTENT_BYTES} / 1024)
+
+  cat <<EOF
+{
+  "version": "${CONTENT_VERSION}",
+  "name": "${CONTENT_FILE}",
+  "sha512": "${CONTENT_SHAB64}",
+  "size": ${CONTENT_SIZE}
+}
+EOF
+}
+
+deb_json() {
+  generate_json $1 $2 _$3.deb
+}
+
 latest_json() {
   LATEST_VERSION=$2
   LATEST_FILE=$1_$2.tar.gz
@@ -82,7 +105,33 @@ main() {
             mv $deb_file ../${DEB_SOC}/
           fi
         done
+        tar_component=-
+        tar_version=-
+        tar_sdk_ver=-
+        if [ "${deb_component}" = "nanokvmpro-kvm" ]; then
+          tar_component=nanokvm_pro
+          for deb_file in nanokvmpro_*.deb kvmcomm_*.deb pikvm_*.deb ; do
+            [ -e $deb_file ] || continue
+            deb_name=`echo $deb_file | cut -d '_' -f 1`
+            deb_ver=`echo $deb_file | cut -d '_' -f 2`
+            deb_arch=`echo $deb_file | cut -d '_' -f 3 | cut -d '.' -f 1`
+            tar_version=${deb_ver}
+            tar_sdk_ver=glibc_${deb_arch}
+            mkdir -p ${tar_component}_${tar_version}
+            cp -p $deb_file ${tar_component}_${tar_version}/
+            deb_json ${deb_name} ${deb_ver} ${deb_arch} > ${tar_component}_${tar_version}/${deb_name}_${deb_ver}.json
+          done
+          tar -czf ${tar_component}_${tar_version}.tar.gz ${tar_component}_${tar_version}
+          latest_json ${tar_component} ${tar_version} > ${tar_component}_latest.json
+          rm -rf ${tar_component}_${tar_version}
+        fi
         popd >/dev/null
+        if [ ${tar_sdk_ver} != "-" ]; then
+          tar_compopool="_site/${tar_component}/${tar_sdk_ver}"
+          mkdir -p "$tar_compopool"
+          mv "$deb_compopool"/${tar_component}_${tar_version}.tar.gz "$tar_compopool"/
+          mv "$deb_compopool"/${tar_component}_latest.json "$tar_compopool"/
+        fi
       done
       for latest_zip_file in $latest_zip_files ; do
       if [ -n "$latest_zip_file" ]
