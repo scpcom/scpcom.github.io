@@ -70,6 +70,7 @@ main() {
       tag="$(echo "$release" | jq -r '.tag_name')"
       deb_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith(".deb")) | .name')"
       deb_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("_debs.tar.gz")) | .name')"
+      kvmadmin_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-kvmadmin.tar.gz")) | .name')"
       latest_zip_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-latest.zip")) | .name')"
       echo "Parsing repo $repo at $tag"
       for deb_file in $deb_files ; do
@@ -135,6 +136,24 @@ main() {
           cp -p "$tar_compopool"/*.tar.* "$tar_compopool"/preview/
           cp -p "$tar_compopool"/*.json "$tar_compopool"/preview/
         fi
+      done
+      for kvmadmin_tar_file in $kvmadmin_tar_files ; do
+      if [ -n "$kvmadmin_tar_file" ]
+      then
+        tar_component="$(echo ${kvmadmin_tar_file} | cut -d '-' -f 1)"
+        tar_arch=${DEB_ARCH}
+        [ "${tar_component}" != "nanokvmpro" ] || tar_arch=arm64
+        [ "${tar_component}" != "nanokvmpro" ] || tar_component=nanokvm_pro
+        tar_sdk_ver=glibc_${tar_arch}
+        tar_compopool="_site/${tar_component}/${tar_sdk_ver}"
+        mkdir -p "$tar_compopool"
+        pushd "$tar_compopool" >/dev/null
+        echo "Getting TAR"
+        wget -q "https://github.com/${repo}/releases/download/${tag}/${kvmadmin_tar_file}"
+        popd >/dev/null
+        mkdir -p "$tar_compopool"/resources
+        mv "$tar_compopool"/${kvmadmin_tar_file} "$tar_compopool"/resources/kvmadmin.tar.gz
+      fi
       done
       for latest_zip_file in $latest_zip_files ; do
       if [ -n "$latest_zip_file" ]
