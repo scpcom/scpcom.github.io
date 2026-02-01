@@ -12,8 +12,8 @@ generate_hashes() {
 }
 
 generate_json() {
-  CONTENT_VERSION=$2
-  CONTENT_FILE=$1_$2$3
+  CONTENT_VERSION=$1
+  CONTENT_FILE=$2
   CONTENT_SHAB64=$(sha512sum ${CONTENT_FILE} | xxd -p -r | basenc --base64 --wrap=0)
   CONTENT_BYTES=$(stat -c %s ${CONTENT_FILE})
   CONTENT_SIZE=${CONTENT_BYTES}
@@ -31,7 +31,11 @@ EOF
 }
 
 deb_json() {
-  generate_json $1 $2 _$3.deb
+  generate_json $2 $1_$2_$3.deb
+}
+
+firmware_json() {
+  generate_json $2 $1_v$2.tar.xz
 }
 
 latest_json() {
@@ -70,6 +74,7 @@ main() {
       tag="$(echo "$release" | jq -r '.tag_name')"
       deb_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith(".deb")) | .name')"
       deb_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("_debs.tar.gz")) | .name')"
+      firmware_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | match("_firmware_.*\\.tar\\..z")) | .name')"
       kvmadmin_tar_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-kvmadmin.tar.gz")) | .name')"
       latest_zip_files="$(echo "$release" | jq -r '.assets[] | select(.name | endswith("-latest.zip")) | .name')"
       echo "Parsing repo $repo at $tag"
@@ -136,6 +141,30 @@ main() {
           cp -p "$tar_compopool"/*.tar.* "$tar_compopool"/preview/
           cp -p "$tar_compopool"/*.json "$tar_compopool"/preview/
         fi
+      done
+     for firmware_tar_file in $firmware_tar_files ; do
+      if [ -n "$firmware_tar_file" ]
+      then
+        firmware_new_file="$(echo ${firmware_tar_file} | cut -d '-' -f 2-)"
+        tar_name="$(echo ${firmware_new_file} | cut -d '_' -f 1-2)"
+        tar_ver="$(echo ${firmware_new_file} | cut -d '_' -f 3- | sed s/'\.tar\..z$'/''/g | tr -d 'v')"
+        tar_component="$(echo ${firmware_tar_file} | cut -d '-' -f 1)"
+        tar_arch=${DEB_ARCH}
+        [ "${tar_component}" != "nanokvmpro" ] || tar_arch=arm64
+        [ "${tar_component}" != "nanokvmpro" ] || tar_component=nanokvm_pro
+        tar_sdk_ver=glibc_${tar_arch}
+        tar_compopool="_site/${tar_component}/${tar_sdk_ver}"
+        mkdir -p "$tar_compopool"
+        pushd "$tar_compopool" >/dev/null
+        echo "Getting TAR"
+        wget -q "https://github.com/${repo}/releases/download/${tag}/${firmware_tar_file}"
+        popd >/dev/null
+        mkdir -p "$tar_compopool"/pro
+        mv "$tar_compopool"/${firmware_tar_file} "$tar_compopool"/pro/${firmware_new_file}
+        pushd "$tar_compopool"/pro >/dev/null
+        firmware_json ${tar_name} ${tar_ver} > firmware_${tar_ver}.json
+        popd >/dev/null
+      fi
       done
       for kvmadmin_tar_file in $kvmadmin_tar_files ; do
       if [ -n "$kvmadmin_tar_file" ]
