@@ -198,9 +198,23 @@ main() {
         wget -q "https://github.com/${repo}/releases/download/${tag}/${latest_zip_file}"
         mv ${latest_zip_file} latest.zip
         rm -f latest
-        unzip latest.zip latest/*
-        zip_version=$(cat latest/version)
-        mv latest ${zip_component}_${zip_version}
+        zip_subdir=latest
+        zip_version=none
+        if [ "${zip_component}" = "maixcam" ]; then
+          zip_subdir=maixapp
+          unzip latest.zip ${zip_subdir}/* usr/*
+          for f in usr/lib/python3.1?/site-packages/MaixPy-*.dist-info ; do
+            [ -e $f ] || continue
+            zip_version=$(basename $f | cut -d '-' -f 2- | sed s'/\.dist-info$'/''/g)
+          done
+          mkdir ${zip_component}_${zip_version}
+          mv ${zip_subdir} usr ${zip_component}_${zip_version}/
+          echo ${zip_version} > ${zip_component}_${zip_version}/version
+        else
+          unzip latest.zip ${zip_subdir}/*
+          zip_version=$(cat ${zip_subdir}/version)
+          mv ${zip_subdir} ${zip_component}_${zip_version}
+        fi
         cp -p ${zip_component}_${zip_version}/version latest
         tar -czf ${zip_component}_${zip_version}.tar.gz ${zip_component}_${zip_version}
         latest_json ${zip_component} ${zip_version} > latest.json
