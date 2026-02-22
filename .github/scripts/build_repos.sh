@@ -98,6 +98,8 @@ main() {
         fi
         deb_component="$(echo ${tar_file} | cut -d '_' -f 1 | sed s/'-emmc$'/''/g | sed s/'-sd$'/''/g)"
         deb_compopool="_site/deb/pool/${deb_component}"
+        deb_soc=${DEB_SOC}
+        [ "${deb_component}" != "nanokvmpro-kvm" ] || deb_soc=ax620e
         GOT_DEB=1
         mkdir -p "$deb_compopool"
         pushd "$deb_compopool" >/dev/null
@@ -105,10 +107,10 @@ main() {
         wget -q "https://github.com/${repo}/releases/download/${tag}/${tar_file}"
         tar -xzf ${tar_file}
         rm -f ${tar_file}
-        for deb_file in *pinmux*.deb ; do
+        for deb_file in *pinmux*.deb libconfig*.deb libjpeg*.deb libwebsockets*.deb ttyd_*.deb ; do
           if [ -e $deb_file ]; then
-            mkdir -p ../${DEB_SOC}
-            mv $deb_file ../${DEB_SOC}/
+            mkdir -p ../${deb_soc}
+            mv $deb_file ../${deb_soc}/
           fi
         done
         tar_component=-
