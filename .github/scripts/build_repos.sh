@@ -107,7 +107,7 @@ main() {
         wget -q "https://github.com/${repo}/releases/download/${tag}/${tar_file}"
         tar -xzf ${tar_file}
         rm -f ${tar_file}
-        for deb_file in *pinmux*.deb libconfig*.deb libjpeg*.deb libwebsockets*.deb ttyd_*.deb ; do
+        for deb_file in *pinmux*.deb libconfig*.deb libjpeg*.deb libopus*.deb libwebsockets*.deb ttyd_*.deb ; do
           if [ -e $deb_file ]; then
             mkdir -p ../${deb_soc}
             mv $deb_file ../${deb_soc}/
