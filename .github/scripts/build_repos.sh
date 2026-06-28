@@ -67,6 +67,9 @@ main() {
   GPG_TTY=""
   export GPG_TTY
   echo "Parsing the repo list"
+  if [ ! -e .github/config/package_list.txt ]; then
+    echo ".github/config/package_list.txt not found in $(pwd)"
+  fi
   while IFS= read -r repo
   do
     if release=$(curl -fqs https://api.github.com/repos/${repo}/releases/latest)
